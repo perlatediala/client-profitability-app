@@ -128,7 +128,7 @@ rows = [
     for _, row in df_result.iterrows()]
 
 
-column_label = selected_products[0] if len(selected_products) == 1 else "Value"
+column_label = selected_products[0] if len(selected_products) == 1 else "Total"
 
 html_table = f"""
 <table style="width:100%; border-collapse: collapse">
