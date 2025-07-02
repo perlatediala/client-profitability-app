@@ -2,11 +2,11 @@ import streamlit as st
 import pandas as pd
 from data import income_statements
 
-# --- App Config ---
+# App Config ------------------------------------------------------------------------------------
 st.set_page_config(page_title="Client Profitability App", layout="wide")
 st.markdown("<h1 style='color:#008B8B; font-weight:bold;'>📊 Client Profitability Consolidator</h1>", unsafe_allow_html=True)
 
-# --- Product Selection -----------------------------------------------------------------------
+# Product Selection -----------------------------------------------------------------------
 product_options = sorted(income_statements.keys())
 
 selected_products = st.sidebar.multiselect(
@@ -14,14 +14,14 @@ selected_products = st.sidebar.multiselect(
     options=product_options,
     default=[product_options[0]])
 
-#### no producted selected handling
+#### no produced selected handling ---------------------------------------------------------
 if not selected_products:
     st.warning("Please select at least one product.")
     st.stop()
 
 # st.sidebar.image("logo.png", use_column_width=True)
 
-# --- Financial Calculations ---
+# Financial Calculations ------------------------------------------------------------
 interest_received = sum(income_statements[p]['interest_received'] for p in selected_products)
 cost_of_funds = -sum(income_statements[p]['cost_of_funds'] for p in selected_products)
 return_on_capital = sum(income_statements[p]['return_on_capital'] for p in selected_products)
@@ -61,7 +61,7 @@ metrics = {
 
 df_result = pd.DataFrame(list(metrics.items()), columns=["Metric", "Value"])
 
-
+#------------------------------------------------------------------------------------------------------------------
 # Format numeric values with spaces for thousands
 def format_number(row):
     val = row['Value']
@@ -81,8 +81,8 @@ def format_number(row):
 
 df_result["Value"] = df_result.apply(format_number, axis=1)
 
-# --- Apply Styling ---
-# Format and bold rows manually as HTML
+# Apply Styling ------------------------------------------------------------
+
 highlight_metrics = {
     'ROE (Return on Equity)',
     'Gross Lending Margin',
@@ -111,7 +111,6 @@ def format_value(metric, value):
 
 def make_row(metric, value):
     color = "#c6efce" if metric == "ROE (Return on Equity)" else "#fff4e6" if metric in highlight_metrics else ""
-    # Apply bold to both metric and value if in highlight list
     if metric in highlight_metrics:
         metric_html = f"<b>{metric}</b>"
         value_html = f"<b>{value}</b>"
@@ -122,7 +121,7 @@ def make_row(metric, value):
     row_style = f' style="background-color:{color}"' if color else ""
     return f"<tr{row_style}><td>{metric_html}</td><td style='text-align:right'>{value_html}</td></tr>"
 
-# Generate a list of HTML-formatted table rows from the DataFrame for display
+# Generate a list of HTML-formatted table rows from the dtaframe
 rows = [
     make_row(row['Metric'], format_value(row['Metric'], row['Value']))
     for _, row in df_result.iterrows()]
@@ -142,6 +141,8 @@ html_table = f"""
 </table>
 """
 
-# Display table with full styling
-st.markdown("#### Consolidated Income Statement", unsafe_allow_html=True)
+
+st.markdown("#### Consolidated Income Statement", unsafe_allow_html=True) #show table
 st.markdown(html_table, unsafe_allow_html=True)
+
+##### End ------------------------------------------------------------------------------------------------------------------
