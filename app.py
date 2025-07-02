@@ -96,16 +96,15 @@ def format_value(metric, value):
         if value == 0:
             return "-"
         
+        # Special handling for ROE (add % sign)
         if metric == "ROE (Return on Equity)":
-            formatted = f"{abs(value):,.2f}".replace(",", " ")
-        else:
-            formatted = f"{abs(round(value)):,}".replace(",", " ")
-
+            return f"{abs(value):,.2f}%".replace(",", " ")
+    
+        formatted = f"{abs(value):,.0f}".replace(",", " ")
         if value < 0:
             return f"-&nbsp;&nbsp;{formatted.rjust(10).replace(' ', '&nbsp;')}"
         else:
             return f"&nbsp;&nbsp;&nbsp;&nbsp;{formatted.rjust(10).replace(' ', '&nbsp;')}"
-    
     return value
 
 
