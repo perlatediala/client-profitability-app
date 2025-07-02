@@ -4,17 +4,17 @@ from data import income_statements
 
 # --- App Config ---
 st.set_page_config(page_title="Client Profitability App", layout="wide")
-st.title("📊 Client Profitability Consolidator")
-#st.markdown("<span style='color:#4B8BBE; font-weight:bold;'>Case Study for FNB</span>", unsafe_allow_html=True)
+st.markdown("<h1 style='color:#008B8B; font-weight:bold;'>📊 Client Profitability Consolidator</h1>", unsafe_allow_html=True)
 
 # --- Product Selection -----------------------------------------------------------------------
 product_options = sorted(income_statements.keys())
+
 selected_products = st.sidebar.multiselect(
     "Select products to consolidate:",
     options=product_options,
-    default=product_options
-)
+    default=[product_options[0]])
 
+#### no producted selected handling
 if not selected_products:
     st.warning("Please select at least one product.")
     st.stop()
@@ -61,7 +61,8 @@ metrics = {
 
 df_result = pd.DataFrame(list(metrics.items()), columns=["Metric", "Value"])
 
-# Format numeric values with spaces for thousands and 2 decimal places
+
+# Format numeric values with spaces for thousands
 def format_number(row):
     val = row['Value']
     metric = row['Metric']
@@ -121,7 +122,7 @@ def make_row(metric, value):
     row_style = f' style="background-color:{color}"' if color else ""
     return f"<tr{row_style}><td>{metric_html}</td><td style='text-align:right'>{value_html}</td></tr>"
 
-
+# Generate a list of HTML-formatted table rows from the DataFrame for display
 rows = [
     make_row(row['Metric'], format_value(row['Metric'], row['Value']))
     for _, row in df_result.iterrows()]
