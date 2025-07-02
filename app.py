@@ -61,6 +61,11 @@ metrics = {
 
 df_result = pd.DataFrame(list(metrics.items()), columns=["Metric", "Value"])
 
+#------------------------------------------------------------------------------------------------------
+# Remove 'Core equity capital holding' if all products are selected
+if set(selected_products) == set(product_options):
+    df_result = df_result[df_result["Metric"] != "Core equity capital holding"]
+
 #------------------------------------------------------------------------------------------------------------------
 # Format numeric values with spaces for thousands
 def format_number(row):
@@ -79,7 +84,7 @@ def format_number(row):
             return f"{val:,.2f}".replace(",", " ")
     return val
 
-df_result["Value"] = df_result.apply(format_number, axis=1)
+# df_result["Value"] = df_result.apply(format_number, axis=1)
 
 # Apply Styling ------------------------------------------------------------
 
@@ -93,18 +98,15 @@ highlight_metrics = {
 
 def format_value(metric, value):
     if isinstance(value, (int, float)):
+        if metric == 'Cost of Funds incl liquids' and value == 0:
+            return ""  
         if value == 0:
             return "-"
-        
-        # Special handling for ROE (add % sign)
         if metric == "ROE (Return on Equity)":
-            return f"{abs(value):,.2f}%".replace(",", " ")
-    
-        formatted = f"{abs(value):,.0f}".replace(",", " ")
+            return f"&nbsp;&nbsp;&nbsp;&nbsp;{abs(value):,.2f}%".replace(",", " ")
         if value < 0:
-            return f"-&nbsp;&nbsp;{formatted.rjust(10).replace(' ', '&nbsp;')}"
-        else:
-            return f"&nbsp;&nbsp;&nbsp;&nbsp;{formatted.rjust(10).replace(' ', '&nbsp;')}"
+            return f"-&nbsp;&nbsp;&nbsp;&nbsp;{abs(value):,.0f}".replace(",", " ").rjust(10).replace(' ', '&nbsp;')
+        return f"&nbsp;&nbsp;&nbsp;&nbsp;{value:,.0f}".replace(",", " ").rjust(10).replace(' ', '&nbsp;')
     return value
 
 
@@ -126,12 +128,14 @@ rows = [
     for _, row in df_result.iterrows()]
 
 
+column_label = selected_products[0] if len(selected_products) == 1 else "Value"
+
 html_table = f"""
 <table style="width:100%; border-collapse: collapse">
     <thead>
         <tr style="background-color:#f0f0f0">
             <th style="text-align:left"></th>
-            <th style="text-align:right">Value</th>
+            <th style="text-align:right">{column_label}</th>
         </tr>
     </thead>
     <tbody>
@@ -139,7 +143,6 @@ html_table = f"""
     </tbody>
 </table>
 """
-
 
 st.markdown("#### Consolidated Income Statement", unsafe_allow_html=True) #show table
 st.markdown(html_table, unsafe_allow_html=True)
