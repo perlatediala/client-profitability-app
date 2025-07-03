@@ -66,25 +66,7 @@ df_result = pd.DataFrame(list(metrics.items()), columns=["Metric", "Value"])
 if set(selected_products) == set(product_options):
     df_result = df_result[df_result["Metric"] != "Core equity capital holding"]
 
-#------------------------------------------------------------------------------------------------------------------
-# Format numeric values with spaces for thousands
-def format_number(row):
-    val = row['Value']
-    metric = row['Metric']
-    
-    if metric == 'Cost of Funds incl liquids' and val==0:
-        return ""  
-    
-    if isinstance(val, (int, float)):
-        if val == 0:
-            return "-" 
-        if val == int(val):
-            return f"{val:,.0f}".replace(",", " ")
-        else: 
-            return f"{val:,.2f}".replace(",", " ")
-    return val
-
-# df_result["Value"] = df_result.apply(format_number, axis=1)
+#-----------------------------------------------------------------------------------------------------------------
 
 # Apply Styling ------------------------------------------------------------
 
@@ -110,7 +92,7 @@ def format_value(metric, value):
     return value
 
 
-def make_row(metric, value):
+def highlight_key_rows(metric, value):
     color = "#c6efce" if metric == "ROE (Return on Equity)" else "#fff4e6" if metric in highlight_metrics else ""
     if metric in highlight_metrics:
         metric_html = f"<b>{metric}</b>"
@@ -124,7 +106,7 @@ def make_row(metric, value):
 
 # Generate a list of HTML-formatted table rows from the dtaframe
 rows = [
-    make_row(row['Metric'], format_value(row['Metric'], row['Value']))
+    highlight_key_rows(row['Metric'], format_value(row['Metric'], row['Value']))
     for _, row in df_result.iterrows()]
 
 
@@ -144,7 +126,12 @@ html_table = f"""
 </table>
 """
 
-st.markdown("#### Consolidated Income Statement", unsafe_allow_html=True) #show table
-st.markdown(html_table, unsafe_allow_html=True)
+
+if len(selected_products) == 1:
+    st.markdown(f"#### {selected_products[0]} Income Statement", unsafe_allow_html=True)
+    st.markdown(html_table, unsafe_allow_html=True)
+else:
+    st.markdown("#### Consolidated Income Statement", unsafe_allow_html=True)
+    st.markdown(html_table, unsafe_allow_html=True)
 
 ##### End ------------------------------------------------------------------------------------------------------------------
